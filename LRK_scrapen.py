@@ -176,7 +176,7 @@ for gemeente in gemeenteNR:
         f.write(datadump)
         f.close()
 
-        # Random aantal seconden wachten (tussen 1 en 6 sec) om de server niet boos te maken
+        # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
         time.sleep(random.randint(1,3))
         
         
@@ -328,7 +328,7 @@ for gemeente in gemeenteNR:
         f.write(datadump)
         f.close()
         
-        # Random aantal seconden wachten (tussen 1 en 6 sec) om de server niet boos te maken
+        # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
         time.sleep(random.randint(1,3))
         
 end = time.time()
@@ -433,7 +433,7 @@ for gemeente in gemeenteNR:
             f.write(datadump)
             f.close()
             
-            # Random aantal seconden wachten (tussen 1 en 6 sec) om de server niet boos te maken
+            # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
             time.sleep(random.randint(1,3))
 
 end = time.time()
