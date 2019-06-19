@@ -81,8 +81,9 @@ for(i in 1:nrow(fpo))
   res_form_adr[[i]] <- adres[[i]][["results"]][["formatted_address"]]
   res_name[[i]] <- adres[[i]][["results"]][["name"]]
   res_pluscode[[i]] <- adres[[i]][["results"]][["plus_code"]]
-  res_rating[[i]] <- adres[[i]][["results"]][["rating"]]
-  res_user_ratings_total[[i]] <- adres[[i]][["results"]][["user_ratings_total"]]
+  res_rating[[i]] <- ifelse(!is.null(adres[[i]][["results"]][["rating"]]), adres[[i]][["results"]][["rating"]], NA)
+  res_user_ratings_total[[i]] <- ifelse(!is.null(adres[[i]][["results"]][["user_ratings_total"]]), 
+                                        adres[[i]][["results"]][["user_ratings_total"]], NA)
     }}
 
 fpo$place_ID <- res_place_id
