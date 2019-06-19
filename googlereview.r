@@ -17,7 +17,7 @@ curl_proxy <- function(url, verbose = TRUE){
 }
 
 #API-key
-API_key <- "AIzaSyCGvCZ3PEZvWT8zpnly8QAFoaWBcErHybc"
+API_key <- ""
 
 #inlezen data kinderopvang
 fpo <- read_excel("//hvdf-san-01/Data/DataBureau X/3-PROGRAMMA INFORMATIE & INNOVATIE/Datavisualisatie/DATA/AGZ/Kinderdagopvang/stamtabel kinderopvang.xlsx")
