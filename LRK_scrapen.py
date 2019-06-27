@@ -131,7 +131,7 @@ for gemeente in gemeenteNR:
         # Loop over het aantal kinderopvangen op de pagina
         for k in range(len(resultaten)):
             
-            print("Loop 1, CBS code: " + gemeente + ", kinderopvang " + identifier)
+            print("Loop 1, CBS code: " + str(gemeente) + ", kinderopvang " + str(identifier))
             
             # Maak entry aan in dictionary
             Kinderopvang[gemeente][identifier] = {}
@@ -206,7 +206,7 @@ for gemeente in gemeenteNR:
     
     for identifier in Kinderopvang[gemeente].keys(): # De identifiers in Kinderopvang worden vanaf 0 opgehoogd met 1, dus kan makkelijk over een vast deel loopen (aangezien dictionaries eigenlijk ongeordend zijn)
         
-        print("Loop 2, CBS code: " + gemeente + ", kinderopvang " + identifier)
+        print("Loop 2, CBS code: " + str(gemeente) + ", kinderopvang " + str(identifier))
         
         url3 = 'https://www.landelijkregisterkinderopvang.nl'+ Kinderopvang[gemeente][identifier]["Link"]
         
@@ -370,7 +370,7 @@ for gemeente in gemeenteNR:
         
         for k in range(len(Kinderopvang[gemeente][identifier]['Inspectie']['link'])):
             
-            print("Loop 3, CBS code: " + gemeente + ", kinderopvang " + identifier + ", inspectierapport " + k)
+            print("Loop 3, CBS code: " + str(gemeente) + ", kinderopvang " + str(identifier) + ", inspectierapport " + str(k))
         
             # url4 = 'https://www.landelijkregisterkinderopvang.nl/pp/inzien/Oko/InspectieRapport.jsf?selectedResultId=183627&documentId=0'
             url4 = 'https://www.landelijkregisterkinderopvang.nl'+ Kinderopvang[gemeente][identifier]['Inspectie']['link'][k]
