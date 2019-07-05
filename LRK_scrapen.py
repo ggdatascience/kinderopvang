@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri May 10 21:11:24 2019
-
 @author: j.ten.velden
 """
 
@@ -13,24 +12,25 @@ import random
 import json
 import math
 import os
+import geocoder
 
 # Pas current directory aan
-os.chdir('G:/Kinderopvang scrapen/')
+os.chdir('C:/Test/Scraping/')
 cd = os.getcwd()
 
 # Bestandsnamen
 resultaat_loop_1 = cd + "\\" + "Resultaat loop 1.json"
 resultaat_loop_2 = cd + "\\" + "Resultaat loop 2.json"
 resultaat_loop_3 = cd + "\\" + "Resultaat loop 3.json"
+resultaat_loop_4 = cd + "\\" + "Resultaat loop 4.json"
 
 ####################
 # Pick your region #
 ####################
 
 # Landelijk, zoals uit het landelijk register kinderopvang
-gemeenteNR = [518, 796, 1680, 358, 197, 59, 482, 613, 361, 141, 34, 484, 1723, 1959, 60, 307, 362, 363, 200, 3, 202, 106, 743, 744, 308, 489, 203, 888, 1954, 370, 889, 1945, 1724, 893, 373, 748, 1859, 1721, 753, 209, 375, 1728, 376, 377, 1901, 755, 1681, 147, 654, 756, 757, 758, 501, 1876, 213, 899, 312, 313, 214, 502, 383, 109, 1706, 1684, 216, 148, 1891, 310, 1940, 736, 1690, 503, 10, 400, 762, 150, 384, 1774, 221, 222, 766, 505, 498, 1719, 303, 225, 226, 1711, 385, 228, 317, 770, 1903, 772, 230, 114, 388, 153, 232, 233, 777, 779, 1771, 1652, 907, 784, 1924, 664, 785, 1942, 512, 513, 786, 14, 1729, 158, 788, 392, 394, 1655, 160, 243, 523, 72, 244, 396, 397, 246, 74, 398, 917, 1658, 399, 163, 530, 794, 531, 164, 1966, 252, 797, 534, 798, 402, 1963, 1735, 1911, 118, 405, 1507, 321, 406, 677, 353, 1884, 166, 678, 537, 928, 1598, 542, 1931, 1659, 1685, 882, 415, 416, 1621, 417, 80, 546, 547, 1916, 995, 1640, 327, 1705, 553, 262, 809, 331, 24, 168, 263, 1641, 556, 935, 420, 938, 1948, 119, 687, 1842, 1731, 1952, 815, 1709, 1978, 1955, 335, 944, 1740, 946, 356, 569, 267, 268, 1930, 1970, 1695, 1699, 171, 575, 820, 302, 579, 823, 824, 1895, 269, 173, 1773, 175, 1586, 826, 85, 431, 432, 86, 828, 1509, 437, 589, 1734, 590, 1894, 765, 1926, 439, 273, 177, 703, 274, 339, 1667, 275, 340, 597, 1742, 603, 1669, 957, 1674, 599, 277, 840, 441, 279, 606, 88, 1676, 965, 1702, 845, 1883, 610, 1714, 90, 342, 847, 848, 37, 180, 532, 851, 1708, 971, 1904, 1900, 715, 93, 448, 1525, 716, 281, 855, 183, 1700, 1730, 737, 856, 450, 451, 184, 344, 1581, 981, 994, 858, 47, 345, 717, 861, 453, 983, 984, 1961, 622, 96, 718, 986, 626, 285, 865, 1949, 866, 867, 627, 289, 629, 852, 988, 457, 1960, 668, 1969, 1701, 293, 1950, 1783, 98, 614, 189, 296, 1696, 352, 294, 873, 632, 880, 351, 479, 297, 473, 50, 355, 299, 637, 638, 1892, 879, 301, 1896, 642, 193 ]
-
 ## Per GGD, met de CBS codes die in het landelijk register kinderopvang staan 
+gemeenteNR = [518, 796, 1680, 358, 197, 59, 482, 613, 361, 141, 34, 484, 1723, 1959, 60, 307, 362, 363, 200, 3, 202, 106, 743, 744, 308, 489, 203, 888, 1954, 370, 889, 1945, 1724, 893, 373, 748, 1859, 1721, 753, 209, 375, 1728, 376, 377, 1901, 755, 1681, 147, 654, 756, 757, 758, 501, 1876, 213, 899, 312, 313, 214, 502, 383, 109, 1706, 1684, 216, 148, 1891, 310, 1940, 736, 1690, 503, 10, 400, 762, 150, 384, 1774, 221, 222, 766, 505, 498, 1719, 303, 225, 226, 1711, 385, 228, 317, 770, 1903, 772, 230, 114, 388, 153, 232, 233, 777, 779, 1771, 1652, 907, 784, 1924, 664, 785, 1942, 512, 513, 786, 14, 1729, 158, 788, 392, 394, 1655, 160, 243, 523, 72, 244, 396, 397, 246, 74, 398, 917, 1658, 399, 163, 530, 794, 531, 164, 1966, 252, 797, 534, 798, 402, 1963, 1735, 1911, 118, 405, 1507, 321, 406, 677, 353, 1884, 166, 678, 537, 928, 1598, 542, 1931, 1659, 1685, 882, 415, 416, 1621, 417, 80, 546, 547, 1916, 995, 1640, 327, 1705, 553, 262, 809, 331, 24, 168, 263, 1641, 556, 935, 420, 938, 1948, 119, 687, 1842, 1731, 1952, 815, 1709, 1978, 1955, 335, 944, 1740, 946, 356, 569, 267, 268, 1930, 1970, 1695, 1699, 171, 575, 820, 302, 579, 823, 824, 1895, 269, 173, 1773, 175, 1586, 826, 85, 431, 432, 86, 828, 1509, 437, 589, 1734, 590, 1894, 765, 1926, 439, 273, 177, 703, 274, 339, 1667, 275, 340, 597, 1742, 603, 1669, 957, 1674, 599, 277, 840, 441, 279, 606, 88, 1676, 965, 1702, 845, 1883, 610, 1714, 90, 342, 847, 848, 37, 180, 532, 851, 1708, 971, 1904, 1900, 715, 93, 448, 1525, 716, 281, 855, 183, 1700, 1730, 737, 856, 450, 451, 184, 344, 1581, 981, 994, 858, 47, 345, 717, 861, 453, 983, 984, 1961, 622, 96, 718, 986, 626, 285, 865, 1949, 866, 867, 627, 289, 629, 852, 988, 457, 1960, 668, 1969, 1701, 293, 1950, 1783, 98, 614, 189, 296, 1696, 352, 294, 873, 632, 880, 351, 479, 297, 473, 50, 355, 299, 637, 638, 1892, 879, 301, 1896, 642, 193 ]
 
 ## Amsterdam
 # gemeenteNR = [358, 362, 363, 384, 437, 451]
@@ -115,7 +115,7 @@ for gemeente in gemeenteNR:
     r = requests.get(url)
     
     # Turn into soup (databestand waar de BeautifulSoup package mee kan werken)
-    soup = BeautifulSoup(r.text)
+    soup = BeautifulSoup(r.text, "html.parser")
     
     # Zoek in soup de div met class "sort-data"
     temp = soup.find('div',{"class": "sort-data"})
@@ -129,7 +129,7 @@ for gemeente in gemeenteNR:
         # Open pagina j van gemeente i
         url2 ='https://www.landelijkregisterkinderopvang.nl/pp/zoeken/AlleOkoTypenZoekResultaten.jsf?currentPage='+ str(j) + '&verantwoordelijkeGemeente=' + str(gemeente) + '&zoekHistorischeNaam=false&zoekStatusSoort=Ingeschreven'
         r2 = requests.get(url2)
-        soup2 = BeautifulSoup(r2.text)
+        soup2 = BeautifulSoup(r2.text, "html.parser")
         
         resultaten = soup2.findAll('li',{"class": "aankeiler"})
         
@@ -176,15 +176,14 @@ for gemeente in gemeenteNR:
             # Hoog id op met 1
             identifier += 1
 
-        datadump = json.dumps(Kinderopvang)
-        f = open("Resultaat loop 1.json", "w")
-        f.write(datadump)
-        f.close()
-
         # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
         time.sleep(random.randint(1,3))
-        
-        
+
+    datadump = json.dumps(Kinderopvang)
+    f = open("Resultaat loop 1.json", "w")
+    f.write(datadump)
+    f.close()
+            
 end = time.time()
 
 Duur_loop1 = end - start
@@ -221,7 +220,7 @@ for gemeente in gemeenteNR:
         # url3 = 'https://www.landelijkregisterkinderopvang.nl/pp/inzien/Oko/Kdv/GegevensOKO.jsf?selectedResultId=85194'
         
         r3 = requests.get(url3)
-        soup3 = BeautifulSoup(r3.text)
+        soup3 = BeautifulSoup(r3.text, "html.parser")
         
         ##
         ## Kerngegevens
@@ -327,14 +326,15 @@ for gemeente in gemeenteNR:
         if len(temp) > 0:
             handhaving = temp[0]['href'] 
             Kinderopvang[gemeente][identifier]['Handhaving'] = handhaving
-            
-        datadump = json.dumps(Kinderopvang)
-        f = open("Resultaat loop 2.json", "w")
-        f.write(datadump)
-        f.close()
+          
         
         # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
         time.sleep(random.randint(1,3))
+
+datadump = json.dumps(Kinderopvang)
+f = open("Resultaat loop 2.json", "w")
+f.write(datadump)
+f.close()
         
 end = time.time()
 
@@ -381,7 +381,7 @@ for gemeente in gemeenteNR:
             url4 = 'https://www.landelijkregisterkinderopvang.nl'+ Kinderopvang[gemeente][identifier]['Inspectie']['link'][k]
             
             r4 = requests.get(url4)
-            soup4 = BeautifulSoup(r4.text)
+            soup4 = BeautifulSoup(r4.text, "html.parser")
             
             gegevens_inspectie = soup4.find('div', {"class": "table-blok marge-top"})
             
@@ -427,24 +427,76 @@ for gemeente in gemeenteNR:
     
                 # Algemeen beeld van de opvang door de toezichthouder    
                 beeld_toezichthouder = soup4.find('div', {'id': 'i_beschouwing'})
-                Kinderopvang[gemeente][identifier]['Inspectierapporten']["Beeld-Toezichthouder"] = beeld_toezichthouder.text
+                
+                if beeld_toezichthouder is not None:
+                    Kinderopvang[gemeente][identifier]['Inspectierapporten']["Beeld-Toezichthouder"] = beeld_toezichthouder.text
                 
                 # Zienswijze van de houder
                 zienswijze_houder = soup4.find('div', {'id': 'i_InspectieRapportDetails:i_zienswijze:i_data_section'})
                 Kinderopvang[gemeente][identifier]['Inspectierapporten']["Zienswijze-Houder"] = zienswijze_houder.text.strip()
                 
-            datadump = json.dumps(Kinderopvang)
-            f = open("Resultaat loop 3.json", "w")
-            f.write(datadump)
-            f.close()
-            
+           
             # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
             time.sleep(random.randint(1,3))
+
+datadump = json.dumps(Kinderopvang)
+f = open("Resultaat loop 3.json", "w")
+f.write(datadump)
+f.close()
 
 end = time.time()
 
 Duur_loop3 = end - start
-print(Duur_loop3)                 
+print(Duur_loop3)
 
+########################################
+#               Loop 4                 #
+# Scrape pagina van inspectierapporten #
+########################################
+
+with open("Resultaat loop 3.json", 'r') as f:
+        Kinderopvang = json.load(f)
+
+gemeenteNR = list(Kinderopvang.keys())
+
+start = time.time()
+
+for gemeente in gemeenteNR:
+    for identifier in Kinderopvang[gemeente].keys(): # De identifiers in Kinderopvang worden vanaf 0 opgehoogd met 1, dus kan makkelijk over een vast deel loopen (aangezien dictionaries eigenlijk ongeordend zijn)
+
+        print("Loop 4, CBS code: " + str(gemeente) + ", kinderopvang " + str(identifier))
+                    
+        Kinderopvang[gemeente][identifier]['Coordinaten'] = {}        
         
+        #Gastouderopvang heeft geen opvangadres, dus zoeken we op vestigingsadres
+        if Kinderopvang[gemeente][identifier]['Soort']  == '(Gastouderbureau)':                
+            
+            #Concat een lookup adres
+            lookupadres = Kinderopvang[gemeente][identifier]['Contactgegevens']['Vestigingsadres']['Adres'] +", "+Kinderopvang[gemeente][identifier]['Contactgegevens']['Vestigingsadres']['Postcode']+" "+Kinderopvang[gemeente][identifier]['Contactgegevens']['Vestigingsadres']['Plaats']
         
+            #Maak gebruik van de Arcgis API, deze heeft geen API key nodig
+            g = geocoder.arcgis(lookupadres)
+               
+        else:
+
+            #Concat een lookup adres
+            lookupadres = Kinderopvang[gemeente][identifier]['Contactgegevens']['Opvangadres (locatie)']['Adres'] +", "+Kinderopvang[gemeente][identifier]['Contactgegevens']['Opvangadres (locatie)']['Postcode']+" "+Kinderopvang[gemeente][identifier]['Contactgegevens']['Opvangadres (locatie)']['Plaats']
+        
+            #Maak gebruik van de Arcgis API, deze heeft geen API key nodig
+            g = geocoder.arcgis(lookupadres)
+        
+            Kinderopvang[gemeente][identifier]["Coordinaten"]["Lat"] = (g.lat)
+            Kinderopvang[gemeente][identifier]["Coordinaten"]["Lng"] = (g.lng)
+        
+        #Random aantal seconden wachten (tussen 0 en 1 sec) om de server niet boos te maken
+        time.sleep(random.randint(0,1))
+            
+datadump = json.dumps(Kinderopvang)
+f = open("Resultaat loop 4.json", "w")
+f.write(datadump)
+f.close()
+
+end = time.time()
+
+Duur_loop4 = end - start
+print(Duur_loop4)
