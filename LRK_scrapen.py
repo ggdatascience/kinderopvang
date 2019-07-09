@@ -451,7 +451,7 @@ print(Duur_loop3)
 
 ########################################
 #               Loop 4                 #
-# Scrape pagina van inspectierapporten #
+# GEOCODING, ophalen GPS per adres     #
 ########################################
 
 with open("Resultaat loop 3.json", 'r') as f:
