@@ -129,12 +129,10 @@ View(dt_verkeerd_test, "check naam matches opties")
 
 lrk_def$match_naam_google <- dt_verkeerd$fuzzytest
 
-write.csv2(dt_verkeerd,"testset_tekstmining_google_placeID.csv")
+#write.csv2(dt_verkeerd,"testset_tekstmining_google_placeID.csv")
 write.csv2(lrk_def,"lrk_def_googlereview.csv")
 
 #TO DO: 
-# error gogle api indien niet utf8 characters in search string zoals "Sórensen" line 36
-#"error_message" : "Invalid request. One of the input parameters contains a non-UTF-8 string."
 #als fuzzytest is FALSE dan opnieuw google api doorlopen? andere opties?
 
 
