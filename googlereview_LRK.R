@@ -133,7 +133,7 @@ lrk_def$match_naam_google <- dt_verkeerd$fuzzytest
 write.csv2(lrk_def,"lrk_def_googlereview.csv")
 
 #TO DO: 
-#als fuzzytest is FALSE dan opnieuw google api doorlopen? andere opties?
+#als fuzzytest is FALSE dan opnieuw google api doorlopen? andere opties? 
 
 
 
