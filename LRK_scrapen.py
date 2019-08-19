@@ -374,6 +374,7 @@ for gemeente in gemeenteNR:
         Kinderopvang[gemeente][identifier]['Inspectierapporten'] = {}
         
         for k in range(len(Kinderopvang[gemeente][identifier]['Inspectie']['link'])):
+            Kinderopvang[gemeente][identifier]['Inspectierapporten'][k] = {}
             
             print("Loop 3, CBS code: " + str(gemeente) + ", kinderopvang " + str(identifier) + ", inspectierapport " + str(k))
         
@@ -404,12 +405,12 @@ for gemeente in gemeenteNR:
                     rechts.append(inspectie_rechts[i].find('a')['href'])
             
             # Initialiseer entry in dictionary om data in op te slaan
-            Kinderopvang[gemeente][identifier]['Inspectierapporten']['Inspectiegegevens'] = {}
+            Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]['Inspectiegegevens'] = {}
             
             # Sla data op in dictionary
             if len(rechts) == len(links):
                 for i in range(len(rechts)):
-                    Kinderopvang[gemeente][identifier]['Inspectierapporten']['Inspectiegegevens'][links[i]] = rechts[i]
+                    Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]['Inspectiegegevens'][links[i]] = rechts[i]
             
             
             # Uitkomsten van de inspectie
@@ -420,20 +421,20 @@ for gemeente in gemeenteNR:
             indicatoren = soup4.findAll("div", {"class": "category-cell"})
             
             if len(indicatoren) > 0:      
-                Kinderopvang[gemeente][identifier]['Inspectierapporten']['Uitkomsten'] = {}
+                Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]['Uitkomsten'] = {}
                 
                 for i in range(len(indicatoren)):
-                    Kinderopvang[gemeente][identifier]['Inspectierapporten']['Uitkomsten'][indicatoren[i]["title"]] = kleur_naar_oordeel(indicatoren[i]["style"]);
+                    Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]['Uitkomsten'][indicatoren[i]["title"]] = kleur_naar_oordeel(indicatoren[i]["style"]);
     
                 # Algemeen beeld van de opvang door de toezichthouder    
                 beeld_toezichthouder = soup4.find('div', {'id': 'i_beschouwing'})
                 
                 if beeld_toezichthouder is not None:
-                    Kinderopvang[gemeente][identifier]['Inspectierapporten']["Beeld-Toezichthouder"] = beeld_toezichthouder.text
+                    Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]["Beeld-Toezichthouder"] = beeld_toezichthouder.text
                 
                 # Zienswijze van de houder
                 zienswijze_houder = soup4.find('div', {'id': 'i_InspectieRapportDetails:i_zienswijze:i_data_section'})
-                Kinderopvang[gemeente][identifier]['Inspectierapporten']["Zienswijze-Houder"] = zienswijze_houder.text.strip()
+                Kinderopvang[gemeente][identifier]['Inspectierapporten'][k]["Zienswijze-Houder"] = zienswijze_houder.text.strip()
                 
            
             # Random aantal seconden wachten (tussen 1 en 3 sec) om de server niet boos te maken
