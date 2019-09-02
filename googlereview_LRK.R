@@ -57,8 +57,8 @@ lrk_def$googlesearchwoonplaats <- stri_enc_toutf8(lrk_def$opvanglocatie_woonplaa
 
 
 
-#for loop Google places API aanroepen
-#FPO#testloop
+#1for loop Google places API aanroepen
+#2FPO#testloop
 #for(i in 1:20) 
 
 require(svMisc)
@@ -98,7 +98,7 @@ for(i in 1:nrow(lrk_def))
   }}
 
 lrk_def$google_lat <- res_lat
-lrk_def$google_lon <-res_lat
+lrk_def$google_lon <-res_lon
 lrk_def$google_place_ID <- res_place_id
 lrk_def$google_name <- res_name
 lrk_def$google_adress <- res_form_adr
