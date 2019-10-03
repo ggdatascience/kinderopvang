@@ -35,33 +35,30 @@ datascrape <- filter(export_opendata_lrk, type_oko != 'VGO')
 url <- as.character(datascrape$contact_website)
 #test met 100
 url <- head(url,100)
-html <- read_html(url[1])
+
 
 # Afzonderlijke pagina's scrapen
 # url facebook ophalen
-get_url <- function(html){
+get_url <- function(url){
+  html <- read_html(url)
   FBurl <- html %>% html_nodes("a") %>% html_attr("href") 
   #unlist()                    
   # Alleen de facebook link opslaan
   FBtable <- data.table(FBurl)
   FBtable[, test := grepl("facebook.com", FBurl), by = FBurl]
   FBtable <- subset(FBtable, test == TRUE, FBurl)
-  FBurl <- head(FBtable, 1)
+  FBlink <- head(FBtable, 1)
+  return(FBlink)
+  
 }
 
+df.fb <- data.frame(id = integer(), url= character(), fburl = character())
+
+for (i in 1:nrow(url)){
+  df.fb[i] <- get_url(url[i])
+}
 
 results <- NULL
 
-for (i in 1:nrow(datascrape)) {
-  # url[[i]] <- 
-  #   url[[i]] %>%
-  #   str_to_lower() %>%
-  #   str_conv("UTF-8")
-  #   message(url)
-  
-  html[[i]] <-read_html(url[[i]])  
-    
-  results[[i]] <- get_url(html[[i]])
-    
    
 }
