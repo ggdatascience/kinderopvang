@@ -1,4 +1,7 @@
 #https://www.datacamp.com/community/tutorials/r-web-scraping-rvest
+
+options(stringsAsFactors = FALSE)
+
 # General-purpose data wrangling
 require(tidyverse)  
 
@@ -32,7 +35,8 @@ datascrape <- filter(export_opendata_lrk, type_oko != 'VGO')
 
 #URL friendly format (UTF-8) 
 #url <- str_conv(datascrape$contact_website, "UTF-8")
-url <- as.character(datascrape$contact_website)
+url <- as.data.frame(as.character(datascrape$contact_website))
+names(url)[1] <- 'v1'
 #test met 100
 url <- head(url,100)
 
@@ -50,12 +54,24 @@ get_url <- function(url){
   FBlink <- head(FBtable, 1)
   return(FBlink)
   
-}
+} # 
 
 df.fb <- data.frame(id = integer(), url= character(), fburl = character())
 
 for (i in 1:nrow(url)){
-  df.fb[i] <- get_url(url[i])
+  
+  if (url$v1[i] == '' ){
+    
+    #df.fb[i, 1] <- id # nog ergens ophalen en wegschrijven
+    df.fb[i, 2] <- url$v1[i]
+    df.fb[i, 3] <- 'geen fb link'
+    
+  } else {
+    
+  df.fb[i, 2] <- url$v1[i]
+  df.fb[i, 3] <- get_url(url$v1[i]) #try catch inbouwen, gaat fout in de functie
+  
+  }
 }
 
 results <- NULL
