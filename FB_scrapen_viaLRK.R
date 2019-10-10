@@ -1,28 +1,31 @@
 #Verkrijgen facebooklinks adv open LRK dataset
-#Chris Elschot & Jeroen ter Voert
+#author: Chris Elschot & Jeroen ter Voert
 #Laatste update oktober 2019
 
 #factors omzetten naar strings
 options(stringsAsFactors = FALSE)
 
-#vereiste packages laden
-#library(curl)
+#evt vereiste packages laden met pacman
+#if (!require("pacman")) install.packages("pacman")
+#pacman::p_load("curl", "tidyverse", "rvest", "data.table")
+library(curl)
 library(rvest)
+library(data.table)
 
-#data via https://data.overheid.nl/dataset/gegevens-kinderopvanglocaties-lrk
-#inlezen data kinderopvang
+#data ophalen via https://data.overheid.nl/dataset/gegevens-kinderopvanglocaties-lrk
+#ophalen en inlezen data kinderopvang
 df.lrk <- read.csv2("http://www.landelijkregisterkinderopvang.nl/opendata/export_opendata_lrk.csv")
 #gastouders eruit
 df.lrk <- df.lrk[df.lrk$type_oko != "VGO", ]
 #geen website naar NA
 df.lrk$contact_website[which(df.lrk$contact_website == "")] <- NA
 
-#gebruik proxy settings via curl (ivm firewall issues))
-#curl_proxy <- function(url, verbose = TRUE){
-#  proxy <- ie_get_proxy_for_url(url)
-#  h <- new_handle(verbose = verbose, proxy = proxy)
-#  curl(url, handle = h)
-#}
+#gebruik evt proxy settings via curl (ivm firewall issues, met name op remotes))
+curl_proxy <- function(url, verbose = TRUE){
+ proxy <- ie_get_proxy_for_url(url)
+ h <- new_handle(verbose = verbose, proxy = proxy)
+ curl(url, handle = h)
+}
 
 #functie die op contact_website zoekt naar facebook websites
 get_FBurl <- function(url){
@@ -43,8 +46,16 @@ get_FBurl <- function(url){
 }
 
 #fb urls voor de 1e 20
-#fburls <- lapply(df.lrk$contact_website[1:20], get_FBurl)
+fburls <- lapply(df.lrk$contact_website[1:30], get_FBurl)
 
+#start runtime meting
+start_time <- Sys.time()
+
 #fb urls voor hele bestand. Index is gelijk aan die van het dataframe df.lrk
 #om het script sneller te maken zouden de NA's uit de input gefilterd kunnen worden, deze returnen namelijk toch altijd NA.
 fburls <- lapply(df.lrk$contact_website, get_FBurl)
+
+#einde runtime meting
+end_time <- Sys.time()
+#print runtime
+end_time - start_time
