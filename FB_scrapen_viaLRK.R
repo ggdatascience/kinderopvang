@@ -32,7 +32,7 @@ get_FBurl <- function(url){
   if (is.na(url)){
     return(list(homepage = url, facebookpage = NA)) #testen of input NA is, zoja return NA
   }
-  try(html <- read_html(url)) #Inlezen html van de webpagina
+  try(html <- read_html(url)) ## #Inlezen html van de webpagina
   if (exists('html')){ #kijken of object all_urls bestaat
     all_urls <- html %>%
       html_nodes("a") %>% #Hyperlinks worden gedefinieerd met de HTML <a> tag
@@ -45,15 +45,51 @@ get_FBurl <- function(url){
   return(list(homepage = url, facebookpage = NA)) # Indien er geen valid homepage is of er geen facebook links zijn return NA
 }
 
-#fb urls voor de 1e 20
-fburls <- lapply(df.lrk$contact_website[1:30], get_FBurl)
+#test fb urls voor de 1e 20
+#fburls <- lapply(df.lrk$contact_website[22:50], get_FBurl)
 
 #start runtime meting
 start_time <- Sys.time()
 
 #fb urls voor hele bestand. Index is gelijk aan die van het dataframe df.lrk
 #om het script sneller te maken zouden de NA's uit de input gefilterd kunnen worden, deze returnen namelijk toch altijd NA.
-fburls <- lapply(df.lrk$contact_website, get_FBurl)
+#fburls <- lapply(df.lrk$contact_website, get_FBurl)
+
+#alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
+#lege list aanmaken voor resultaten en var voor urls
+d <- vector("list", length(df.lrk$contact_website))
+links<- df.lrk$contact_website
+for (i in seq_along(links)) {
+  if (!(links[i] %in% names(d))) {
+    cat(paste("Scraping", links[i], "..."))
+    ok <- FALSE
+    counter <- 0
+    while (ok == FALSE & counter <= 5) {
+      counter <- counter + 1
+      out <- tryCatch({                  
+        get_FBurl(links[i])
+      },
+      error = function(e) {
+        Sys.sleep(2)
+        e
+      }
+      )
+      if ("error" %in% class(out)) {
+        cat(".")
+      } else {
+        ok <- TRUE
+        cat(" Done.")
+      }
+    }
+    cat("\n")
+    d[[i]] <- out
+    names(d)[i] <- links[i]
+  }
+  #evt pauze inbouwen om connecties te closen
+  Sys.sleep(1) #pause to let connection work
+  closeAllConnections()
+  gc()
+} 
 
 #einde runtime meting
 end_time <- Sys.time()
