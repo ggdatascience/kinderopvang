@@ -90,7 +90,7 @@ for (i in seq_along(links)) {
   closeAllConnections()
   gc()
 } 
-
+fburls2 <- d
 #einde runtime meting
 end_time <- Sys.time()
 #print runtime
