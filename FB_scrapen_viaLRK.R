@@ -90,7 +90,7 @@ for (i in seq_along(links)) {
   closeAllConnections()
   gc()
 } 
-fburls2 <- d
+lapply(d, function(x) write.table(data.frame(x), 'lrk_fburls.csv' , append= T, sep=';'))
 #einde runtime meting
 end_time <- Sys.time()
 #print runtime
