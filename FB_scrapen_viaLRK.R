@@ -19,7 +19,7 @@ df.lrk <- read.csv2("http://www.landelijkregisterkinderopvang.nl/opendata/export
 df.lrk <- df.lrk[df.lrk$type_oko != "VGO", ]
 #geen website naar NA
 df.lrk$contact_website[which(df.lrk$contact_website == "")] <- NA
-
+
 #gebruik evt proxy settings via curl (ivm firewall issues, met name op remotes))
 curl_proxy <- function(url, verbose = TRUE){
  proxy <- ie_get_proxy_for_url(url)
@@ -58,7 +58,8 @@ start_time <- Sys.time()
 #alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
 #lege list aanmaken voor resultaten en var voor urls
 d <- vector("list", length(df.lrk$contact_website))
-links<- df.lrk$contact_website
+#standaard https request maken ivm 404 errors
+links<- gsub("http", "https",df.lrk$contact_website)
 for (i in seq_along(links)) {
   if (!(links[i] %in% names(d))) {
     cat(paste("Scraping", links[i], "..."))
