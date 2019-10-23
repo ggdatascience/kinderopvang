@@ -7,10 +7,11 @@ options(stringsAsFactors = FALSE)
 
 #evt vereiste packages laden met pacman
 #if (!require("pacman")) install.packages("pacman")
-#pacman::p_load("curl", "tidyverse", "rvest", "data.table")
+#pacman::p_load("curl", "tidyverse", "rvest", "data.table", "Rcrawler")
 library(curl)
 library(rvest)
 library(data.table)
+library(Rcrawler)
 
 #data ophalen via https://data.overheid.nl/dataset/gegevens-kinderopvanglocaties-lrk
 #ophalen en inlezen data kinderopvang
@@ -27,22 +28,19 @@ curl_proxy <- function(url, verbose = TRUE){
  curl(url, handle = h)
 }
 
-#functie die op contact_website zoekt naar facebook websites
+#functie die op contact_website zoekt naar facebook websites met rcrawl
 get_FBurl <- function(url){
   if (is.na(url)){
-    return(list(homepage = url, facebookpage = NA)) #testen of input NA is, zoja return NA
+    return(list(homepage = url, facebookpagina = NA)) #testen of input NA is, zoja return NA
   }
-  try(html <- read_html(url)) ## #Inlezen html van de webpagina
-  if (exists('html')){ #kijken of object all_urls bestaat
-    all_urls <- html %>%
-      html_nodes("a") %>% #Hyperlinks worden gedefinieerd met de HTML <a> tag
-      html_attr("href") #Het href attribuut bevat het webadres waar naar gelinkt wordt
-    FBurl <- unique(all_urls[which(grepl('facebook', all_urls))]) #Alleen de unieke adressen met "facebook.com" erin
+  try(rcrawl<- LinkExtractor(url, ExternalLInks = TRUE)) ## #Inlezen html van de webpagina
+  if (exists('rcrawl')){ 
+    FBurl <- head(unique(rcrawl$ExternalLinks[which(grepl('facebook', rcrawl$ExternalLinks))]),1) #Alleen de unieke adressen met "facebook.com" erin en daar de eerste van
     if (length(FBurl) > 0){
       return(list(homepage = url, facebookpage = FBurl)) #kan meerdere waarden bevatten dus returnen als list
     }
   }
-  return(list(homepage = url, facebookpage = NA)) # Indien er geen valid homepage is of er geen facebook links zijn return NA
+  return(list(homepage = url, facebookpagina = NA)) # Indien er geen valid homepage is of er geen facebook links zijn return NA
 }
 
 #test fb urls voor de 1e 20
@@ -58,9 +56,10 @@ start_time <- Sys.time()
 #alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
 #lege list aanmaken voor resultaten en var voor urls
 d <- vector("list", length(df.lrk$contact_website))
-#standaard https request maken ivm 404 errors
-links<- gsub("http", "https",df.lrk$contact_website)
-for (i in seq_along(links)) {
+# #standaard https request maken ivm 404 errors
+# links<- gsub("http", "https",df.lrk$contact_website)
+links<- df.lrk$contact_website
+for (i in 1:20)  { ##seq_along(links))
   if (!(links[i] %in% names(d))) {
     cat(paste("Scraping", links[i], "..."))
     ok <- FALSE
@@ -87,11 +86,12 @@ for (i in seq_along(links)) {
     names(d)[i] <- links[i]
   }
   #evt pauze inbouwen om connecties te closen
-  Sys.sleep(1) #pause to let connection work
+  #Sys.sleep(1) #pause to let connection work
   closeAllConnections()
   gc()
 } 
-lapply(d, function(x) write.table(data.frame(x), 'lrk_fburls.csv' , append= T, sep=';'))
+#output van geneste lists naar dataframe
+df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
 #einde runtime meting
 end_time <- Sys.time()
 #print runtime
