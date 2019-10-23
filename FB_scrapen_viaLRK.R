@@ -37,7 +37,7 @@ get_FBurl <- function(url){
     all_urls <- html %>%
       html_nodes("a") %>% #Hyperlinks worden gedefinieerd met de HTML <a> tag
       html_attr("href") #Het href attribuut bevat het webadres waar naar gelinkt wordt
-    FBurl <- unique(all_urls[which(grepl('facebook.com', all_urls))]) #Alleen de unieke adressen met "facebook.com" erin
+    FBurl <- unique(all_urls[which(grepl('facebook', all_urls))]) #Alleen de unieke adressen met "facebook.com" erin
     if (length(FBurl) > 0){
       return(list(homepage = url, facebookpage = FBurl)) #kan meerdere waarden bevatten dus returnen als list
     }
