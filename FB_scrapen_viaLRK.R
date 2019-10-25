@@ -96,3 +96,7 @@ df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
 end_time <- Sys.time()
 #print runtime
 end_time - start_time
+
+#write.csv2(dt_verkeerd,"testset_tekstmining_google_placeID.csv")
+write.csv2(lrk_def,"lrk_fburls.csv")
+
