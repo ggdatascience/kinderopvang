@@ -28,16 +28,16 @@ curl_proxy <- function(url, verbose = TRUE){
  curl(url, handle = h)
 }
 
-#functie die op contact_website zoekt naar facebook websites met rcrawl
+#functie die op contact_website zoekt naar facebook websites met Rcrawler
 get_FBurl <- function(url){
   if (is.na(url)){
     return(list(homepage = url, facebookpagina = NA)) #testen of input NA is, zoja return NA
   }
-  try(rcrawl<- LinkExtractor(url, ExternalLInks = TRUE)) ## #Inlezen html van de webpagina
+  try(rcrawl<- LinkExtractor(url, ExternalLInks = TRUE, Useragent = "Chrome/41.0.2228.0")) ## #Inlezen html van de webpagina
   if (exists('rcrawl')){ 
     FBurl <- head(unique(rcrawl$ExternalLinks[which(grepl('facebook', rcrawl$ExternalLinks))]),1) #Alleen de unieke adressen met "facebook.com" erin en daar de eerste van
     if (length(FBurl) > 0){
-      return(list(homepage = url, facebookpage = FBurl)) #kan meerdere waarden bevatten dus returnen als list
+      return(list(homepage = url, facebookpagina = FBurl)) #kan meerdere waarden bevatten dus returnen als list
     }
   }
   return(list(homepage = url, facebookpagina = NA)) # Indien er geen valid homepage is of er geen facebook links zijn return NA
@@ -56,10 +56,10 @@ start_time <- Sys.time()
 #alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
 #lege list aanmaken voor resultaten en var voor urls
 d <- vector("list", length(df.lrk$contact_website))
-# #standaard https request maken ivm 404 errors
+# #evt https request maken ivm 404 errors
 # links<- gsub("http", "https",df.lrk$contact_website)
 links<- df.lrk$contact_website
-for (i in 1:20)  { ##seq_along(links))
+for (i in seq_along(links))  { ##seq_along(links))
   if (!(links[i] %in% names(d))) {
     cat(paste("Scraping", links[i], "..."))
     ok <- FALSE
