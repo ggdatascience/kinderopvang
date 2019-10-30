@@ -56,10 +56,13 @@ start_time <- Sys.time()
 #alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
 #lege list aanmaken voor resultaten en var voor urls
 d <- vector("list", length(df.lrk$contact_website))
-# #evt https request maken ivm 404 errors
+# #evt https request maken ivm 404 errors, let op slechts 1 keer runnen anders httpssss
 # links<- gsub("http", "https",df.lrk$contact_website)
-links<- df.lrk$contact_website
-for (i in seq_along(links))  { ##seq_along(links))
+
+#Alleen opvang waarvan een url beschikbaar is runnen.
+links<- df.lrk$contact_website[which(df.lrk$contact_website!='NA')]
+d <- vector("list", length(links))
+for (i in seq_along(links))  { # of testrun via '1:100' ipv seq_along(links)
   if (!(links[i] %in% names(d))) {
     cat(paste("Scraping", links[i], "..."))
     ok <- FALSE
@@ -76,6 +79,7 @@ for (i in seq_along(links))  { ##seq_along(links))
       )
       if ("error" %in% class(out)) {
         cat(".")
+        error <- links[i]
       } else {
         ok <- TRUE
         cat(" Done.")
@@ -86,9 +90,9 @@ for (i in seq_along(links))  { ##seq_along(links))
     names(d)[i] <- links[i]
   }
   #evt pauze inbouwen om connecties te closen
-  #Sys.sleep(1) #pause to let connection work
-  closeAllConnections()
-  gc()
+  Sys.sleep(1) #pause to let connection work
+  #closeAllConnections()
+  #gc()
 } 
 #output van geneste lists naar dataframe
 df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
@@ -97,6 +101,6 @@ end_time <- Sys.time()
 #print runtime
 end_time - start_time
 
-#write.csv2(dt_verkeerd,"testset_tekstmining_google_placeID.csv")
-write.csv2(lrk_def,"lrk_fburls.csv")
+#write.csv2 fburls naar csv
+write.csv2(df.fb,"lrk_fburls_scrape.csv")
 
