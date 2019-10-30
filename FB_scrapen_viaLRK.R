@@ -34,10 +34,21 @@ get_FBurl <- function(url){
     return(list(homepage = url, facebookpagina = NA)) #testen of input NA is, zoja return NA
   }
   try(rcrawl<- LinkExtractor(url, ExternalLInks = TRUE, Useragent = "Chrome/41.0.2228.0")) ## #Inlezen html van de webpagina
-  if (exists('rcrawl')){ 
+  options(show.error.messages = TRUE) 
+  if (rcrawl$Info['Status_code'] != '404'){ 
     FBurl <- head(unique(rcrawl$ExternalLinks[which(grepl('facebook', rcrawl$ExternalLinks))]),1) #Alleen de unieke adressen met "facebook.com" erin en daar de eerste van
     if (length(FBurl) > 0){
       return(list(homepage = url, facebookpagina = FBurl)) #kan meerdere waarden bevatten dus returnen als list
+    }
+  }
+  if(rcrawl$Info['Status_code'] == '404'){
+    url<-gsub("http", "https",url)
+    try(rcrawl<- LinkExtractor(url, ExternalLInks = TRUE, Useragent = "Chrome/41.0.2228.0")) ## #Inlezen html van de webpagina
+    if (rcrawl$Info['Status_code'] != '404'){ 
+      FBurl <- head(unique(rcrawl$ExternalLinks[which(grepl('facebook', rcrawl$ExternalLinks))]),1) #Alleen de unieke adressen met "facebook.com" erin en daar de eerste van
+      if (length(FBurl) > 0){
+        return(list(homepage = url, facebookpagina = FBurl))
+      }
     }
   }
   return(list(homepage = url, facebookpagina = NA)) # Indien er geen valid homepage is of er geen facebook links zijn return NA
@@ -46,24 +57,23 @@ get_FBurl <- function(url){
 #test fb urls voor de 1e 20
 #fburls <- lapply(df.lrk$contact_website[22:50], get_FBurl)
 
-#start runtime meting
-start_time <- Sys.time()
-
 #fb urls voor hele bestand. Index is gelijk aan die van het dataframe df.lrk
 #om het script sneller te maken zouden de NA's uit de input gefilterd kunnen worden, deze returnen namelijk toch altijd NA.
 #fburls <- lapply(df.lrk$contact_website, get_FBurl)
 
 #alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
 #lege list aanmaken voor resultaten en var voor urls
-d <- vector("list", length(df.lrk$contact_website))
-# #evt https request maken ivm 404 errors, let op slechts 1 keer runnen anders httpssss
-# links<- gsub("http", "https",df.lrk$contact_website)
-
-#Alleen opvang waarvan een url beschikbaar is runnen.
-links<- df.lrk$contact_website[which(df.lrk$contact_website!='NA')]
+d <- NULL
+#Alleen opvang waarvan een url beschikbaar is runnen.En spaties weghalen met gsub.
+links<- gsub(" ", "", (df.lrk$contact_website[which(df.lrk$contact_website!='NA')]), fixed = TRUE)
 d <- vector("list", length(links))
-for (i in seq_along(links))  { # of testrun via '1:100' ipv seq_along(links)
-  if (!(links[i] %in% names(d))) {
+#start runtime meting
+start_time <- Sys.time()
+
+
+#for (i in 13000:13100)  { # testrun 100
+for (i in seq_along(links))  { # volledige loop
+    if (!(links[i] %in% names(d))) {
     cat(paste("Scraping", links[i], "..."))
     ok <- FALSE
     counter <- 0
@@ -78,8 +88,8 @@ for (i in seq_along(links))  { # of testrun via '1:100' ipv seq_along(links)
       }
       )
       if ("error" %in% class(out)) {
-        cat(".")
-        error <- links[i]
+        cat("error")
+        errorlist <- links[i]
       } else {
         ok <- TRUE
         cat(" Done.")
@@ -90,9 +100,9 @@ for (i in seq_along(links))  { # of testrun via '1:100' ipv seq_along(links)
     names(d)[i] <- links[i]
   }
   #evt pauze inbouwen om connecties te closen
-  Sys.sleep(1) #pause to let connection work
-  #closeAllConnections()
-  #gc()
+  Sys.sleep(1) 
+  closeAllConnections()
+  gc()
 } 
 #output van geneste lists naar dataframe
 df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
