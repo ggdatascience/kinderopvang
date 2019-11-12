@@ -57,60 +57,70 @@ get_FBurl <- function(url){
 #test fb urls voor de 1e 20
 #fburls <- lapply(df.lrk$contact_website[22:50], get_FBurl)
 
-#fb urls voor hele bestand. Index is gelijk aan die van het dataframe df.lrk
-#om het script sneller te maken zouden de NA's uit de input gefilterd kunnen worden, deze returnen namelijk toch altijd NA.
-#fburls <- lapply(df.lrk$contact_website, get_FBurl)
-
-#alternatieve methode met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
-#lege list aanmaken voor resultaten en var voor urls
-d <- NULL
-#Alleen opvang waarvan een url beschikbaar is runnen.En spaties weghalen met gsub.
+#fb urls voor hele bestand. Index is gelijk aan die van het dataframe df.lrk. Runtime op LRK bestand is ongeveer 4 uur.
 links<- gsub(" ", "", (df.lrk$contact_website[which(df.lrk$contact_website!='NA')]), fixed = TRUE)
-d <- vector("list", length(links))
 #start runtime meting
 start_time <- Sys.time()
-
-
-#for (i in 13000:13100)  { # testrun 100
-for (i in seq_along(links))  { # volledige loop
-    if (!(links[i] %in% names(d))) {
-    cat(paste("Scraping", links[i], "..."))
-    ok <- FALSE
-    counter <- 0
-    while (ok == FALSE & counter <= 5) {
-      counter <- counter + 1
-      out <- tryCatch({                  
-        get_FBurl(links[i])
-      },
-      error = function(e) {
-        Sys.sleep(2)
-        e
-      }
-      )
-      if ("error" %in% class(out)) {
-        cat("error")
-        errorlist <- links[i]
-      } else {
-        ok <- TRUE
-        cat(" Done.")
-      }
-    }
-    cat("\n")
-    d[[i]] <- out
-    names(d)[i] <- links[i]
-  }
-  #evt pauze inbouwen om connecties te closen
-  Sys.sleep(1) 
-  closeAllConnections()
-  gc()
-} 
-#output van geneste lists naar dataframe
-df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
+fburls <- lapply(links, get_FBurl)
 #einde runtime meting
 end_time <- Sys.time()
 #print runtime
 end_time - start_time
+df.fb2 <- rbindlist(fburls,use.names=TRUE,fill=TRUE)
+write.csv2(df.fb,"lrk_fburls_scrape_v2.csv")
 
-#write.csv2 fburls naar csv
-write.csv2(df.fb,"lrk_fburls_scrape.csv")
+# #alternatieve methode 
+# #met for loop om troubleshooting makkelijker te maken, trycatch als connectie niet lukt en error counter
+# #runtime is wel stuk hoger rond 19u, geen paralel computing.
+# 
+# #lege list aanmaken voor resultaten en var voor urls
+# d <- NULL
+# #Alleen opvang waarvan een url beschikbaar is runnen.En spaties weghalen met gsub.
+# links<- gsub(" ", "", (df.lrk$contact_website[which(df.lrk$contact_website!='NA')]), fixed = TRUE)
+# d <- vector("list", length(links))
+# #start runtime meting
+# start_time <- Sys.time()
+# 
+# 
+# #for (i in 13000:13100)  { # testrun 100
+# for (i in seq_along(links))  { # volledige loop
+#     if (!(links[i] %in% names(d))) {
+#     cat(paste("Scraping", links[i], "..."))
+#     ok <- FALSE
+#     counter <- 0
+#     while (ok == FALSE & counter <= 5) {
+#       counter <- counter + 1
+#       out <- tryCatch({                  
+#         get_FBurl(links[i])
+#       },
+#       error = function(e) {
+#         Sys.sleep(3)
+#         e
+#       }
+#       )
+#       if ("error" %in% class(out)) {
+#         cat(".")
+#       } else {
+#         ok <- TRUE
+#         cat(" Done.")
+#       }
+#     }
+#     cat("\n")
+#     d[[i]] <- out
+#     names(d)[i] <- links[i]
+#   }
+#   #evt pauze inbouwen om connecties te closen
+#   Sys.sleep(3) 
+#   closeAllConnections()
+#   gc()
+# } 
+# #output van geneste lists naar dataframe
+# df.fb <- rbindlist(d,use.names=TRUE,fill=TRUE)
+# #einde runtime meting
+# end_time <- Sys.time()
+# #print runtime
+# end_time - start_time
+# 
+# #write.csv2 fburls naar csv
+# write.csv2(df.fb,"lrk_fburls_scrape.csv")
 
