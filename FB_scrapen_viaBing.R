@@ -13,6 +13,10 @@ require(rebus)
 
 # Eases DateTime manipulation
 require(lubridate)
+# tekst matching
+library(data.table)
+library(caret)
+library(e1071)
 
 #gebruik proxy settings via curl (ivm firewall issues))
 curl_proxy <- function(url, verbose = TRUE){
@@ -60,52 +64,40 @@ html <- read_html(url[2])
 # Afzonderlijke pagina's scrapen
 # url facebook ophalen
 get_url <- function(html){
-  html %>% 
+  FBurl <- html %>% 
     # The relevant html tag voor de url in de zoekresultaten van bing
     html_nodes(".b_algo") %>% html_nodes("a") %>% 
     html_attr("href") 
     #html_text() %>% 
     # Trim additional white space
-    str_trim() %>%                      
+    #str_trim() %>%                      
     # Convert the list into a vector
-    unlist()                             
+    unlist()
+    FBtable <- data.table(FBurl)
+    FBtable[, test := grepl("facebook", FBurl), by = FBurl]
+    FBtable <- subset(FBtable, test == TRUE, FBurl)
+    FBurl <- head(FBtable, 1)
 }
 
 get_rating <- function(html){
-  
-  # The pattern you look for: the first digit after `count-`
-  pattern = 'count-'%R% capture(DIGIT)    
-  
-  ratings <-  html %>% 
-    html_nodes('.b_srtxtstarcolor') %>% 
-    html_nodes('span') %>%
-    html_attr('aria-label') %>%
-    #html_text() %>% 
-    # Apply the pattern match to all attributes
-    #map(str_match, pattern = pattern) %>%
-    # str_match[1] is the fully matched string, the second entry
-    # is the part you extract with the capture in your pattern  
-    map(2) %>%                             
-    
-    unlist()
-  
-  # Leave out the first instance, as it is not part of a review
-  ratings[2:length(ratings)]               
+  rating <- html%>%
+    html_nodes(".b_algo") %>% html_nodes(".b_sritem") %>% html_nodes("span") %>% html_attr("aria-label")  %>%
+    map(1)
+    rating <- rating[1]
 }
 
 
-get_data_table <- function(html, company_name){
+#TOT HIER GEDAAN
+get_data_table <- function(html, URL){
   
   # Extract the Basic information from the HTML
-  reviews <- get_reviews(html)
-  reviewer_names <- get_reviewer_names(html)
-  dates <- get_review_dates(html)
-  ratings <- get_star_rating(html)
+  fburl <- get_url(html)
+  rating <- get_rating(html)
+  
   
   # Combine into a tibble
-  combined_data <- tibble(reviewer = reviewer_names,
-                          date = dates,
-                          rating = ratings,
+  combined_data <- tibble(facebook = fburl,
+                          fbrating = rating,
                           review = reviews) 
   
   # Tag the individual data with the company name
