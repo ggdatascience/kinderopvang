@@ -67,6 +67,8 @@ end_time <- Sys.time()
 #print runtime
 end_time - start_time
 df.fb2 <- rbindlist(fburls,use.names=TRUE,fill=TRUE)
+df.fb2 <-fburls[2:3] #drop index var
+df.fb2 <-unique(fburls[1:2]) #remove duplicates
 write.csv2(df.fb,"lrk_fburls_scrape_v2.csv")
 
 # #alternatieve methode 
